@@ -1,0 +1,4049 @@
+{
+  "name": "Proposal AI Agent 6-Nov",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "PUT",
+        "path": "fireflies-meeting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "946c855c-3955-41b2-a749-a114e3d01ad4",
+      "name": "Webhook",
+      "webhookId": "b135617d-a218-4161-8ab7-cabbfe2ad777"
+    },
+    {
+      "parameters": {
+        "transcriptId": "={{ $json.body.meetingId }}"
+      },
+      "type": "@firefliesai/n8n-nodes-fireflies.fireflies",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "41610dcc-bbd6-45cf-89a7-158d50660499",
+      "name": "Get a transcript",
+      "credentials": {
+        "firefliesApi": {
+          "id": "RxHxa95M3RJ4naxF",
+          "name": "Fireflies am.mirke.ai@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data.sentences }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an assistant that prepares concise, persuasive sales proposal content.\nInput: A transcript of a sales meeting with a client.\nTask: Summarize the transcript into a structured JSON strictly following the schema below.\n\nRules:\n        •        Each field must be a single sentence or maximum two sentences.\n        •        Do not use bullet points, lists, or multiline formatting.\n        •        Use a persuasive, client-focused tone.\n        •        Adapt tone per field:\n        •        Challenges → empathetic,\n        •        Scope/Deliverables → authoritative,\n        •        Benefits & ROI → results-driven,\n        •        Next Steps → action-oriented.\n        •        Output only valid JSON.\n\nSchema to follow:\n{\n  \"ClientInfo_ClientName\": \"string\",\n  \"ProjectOverview_Description\": \"string\",\n  \"CurrentChallenges_Text\": \"string\",\n  \"ScopeOfWork_Text\": \"string\",\n  \"KeyDeliverables_Text\": \"string\",\n  \"BenefitsROI_Heading\": \"string\",\n  \"BenefitsROI_Text\": \"string\",\n  \"ResponsibilitiesTimelines_Text\": \"string\",\n  \"Investment_ReviewPeriod\": \"string\",\n  \"NextSteps_Heading\": \"string\",\n  \"NextSteps_Text\": \"string\"\n}\n✅ Example Output\n{\n  \"ClientInfo_ClientName\": \"Prima World\",\n  \"ProjectOverview_Description\": \"Prima World is a leading personal hygiene brand seeking to expand revenue through category and channel growth.\",\n  \"CurrentChallenges_Text\": \"The brand lacks a clear roadmap for scaling and aligning offers with market expectations.\",\n  \"ScopeOfWork_Text\": \"We will drive category expansion, open new channels, and enhance customer loyalty.\",\n  \"KeyDeliverables_Text\": \"Our team will define strategy, optimize pricing, manage execution, and launch growth campaigns.\",\n  \"BenefitsROI_Heading\": \"Benefits & ROI\",\n  \"BenefitsROI_Text\": \"The proposal ensures higher revenue, reduced costs, and faster execution for sustainable growth.\",\n  \"ResponsibilitiesTimelines_Text\": \"Execution will be shared between both teams with regular reviews to ensure progress.\",\n  \"Investment_ReviewPeriod\": \"A four-month review will assess performance and ROI.\",\n  \"NextSteps_Heading\": \"Next Steps\",\n  \"NextSteps_Text\": \"We recommend starting with a pilot project, aligning budgets, and finalizing the roadmap.\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "8708aa04-8052-46f7-95cd-243c3601ead7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        448,
+        224
+      ],
+      "id": "d40e21d4-8b49-495b-89e7-c4c6272fc3fa",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "giHf9f8MrBDnSojZ",
+          "name": "Google Gemini(PaLM) Api account 10"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1OMeya9Qo295F2KRYZc2O4-Vb6jaJLeKGpxYmGDQo6ew",
+          "mode": "list",
+          "cachedResultName": "Proposal - Our Valued Client",
+          "cachedResultUrl": "https://docs.google.com/presentation/d/1OMeya9Qo295F2KRYZc2O4-Vb6jaJLeKGpxYmGDQo6ew/edit?usp=drivesdk"
+        },
+        "name": "=Proposal - {{ $json.output.ClientInfo_ClientName }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        800,
+        0
+      ],
+      "id": "c230dc08-8e98-4282-a8f3-86622eeae516",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "e8zOkNx4f2J3McXj",
+          "name": "Google Drive account 14"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"ClientInfo_ClientName\": \"Prima World\",\n  \"ProjectOverview_Description\": \"Prima World is a leading personal hygiene brand seeking to expand revenue through category and channel growth.\",\n  \"CurrentChallenges_Text\": \"The brand lacks a clear roadmap for scaling and aligning offers with market expectations.\",\n  \"ScopeOfWork_Text\": \"We will drive category expansion, open new channels, and enhance customer loyalty.\",\n  \"KeyDeliverables_Text\": \"Our team will define strategy, optimize pricing, manage execution, and launch growth campaigns.\",\n  \"BenefitsROI_Heading\": \"Benefits & ROI\",\n  \"BenefitsROI_Text\": \"The proposal ensures higher revenue, reduced costs, and faster execution for sustainable growth.\",\n  \"ResponsibilitiesTimelines_Text\": \"Execution will be shared between both teams with regular reviews to ensure progress.\",\n  \"Investment_ReviewPeriod\": \"A four-month review will assess performance and ROI.\",\n  \"NextSteps_Heading\": \"Next Steps\",\n  \"NextSteps_Text\": \"We recommend starting with a pilot project, aligning budgets, and finalizing the roadmap.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        208
+      ],
+      "id": "845a6783-12ef-4c7f-a30b-b8b7f3432770",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1008,
+        0
+      ],
+      "id": "cfbe1211-b081-4a70-a88e-da7c46a0564d",
+      "name": "Share file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "e8zOkNx4f2J3McXj",
+          "name": "Google Drive account 14"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "replaceText",
+        "presentationId": "={{ $('Copy file').item.json.id }}",
+        "textUi": {
+          "textValues": [
+            {
+              "pageObjectIds": [
+                "p1"
+              ],
+              "text": "{{ClientInfo_ClientName}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.ClientInfo_ClientName }}"
+            },
+            {
+              "pageObjectIds": [
+                "p2"
+              ],
+              "text": "{{ProjectOverview_Description}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.ProjectOverview_Description }}"
+            },
+            {
+              "pageObjectIds": [
+                "p3"
+              ],
+              "text": "{{CurrentChallenges_Text}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.CurrentChallenges_Text }}"
+            },
+            {
+              "pageObjectIds": [
+                "p4"
+              ],
+              "text": "{{ScopeOfWork_Text}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.ScopeOfWork_Text }}"
+            },
+            {
+              "pageObjectIds": [
+                "p5"
+              ],
+              "text": "{{KeyDeliverables_Text}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.KeyDeliverables_Text }}"
+            },
+            {
+              "pageObjectIds": [
+                "g37ba39391e9_0_13"
+              ],
+              "text": "{{BenefitsROI_Text}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.BenefitsROI_Heading }}"
+            },
+            {
+              "pageObjectIds": [
+                "p6"
+              ],
+              "text": "{{ResponsibilitiesTimelines_Text}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.BenefitsROI_Text }}"
+            },
+            {
+              "pageObjectIds": [
+                "p7"
+              ],
+              "text": "{{ClientInfo_ClientName}} ",
+              "replaceText": "={{ $('AI Agent').item.json.output.ClientInfo_ClientName }}"
+            },
+            {
+              "pageObjectIds": [
+                "p7"
+              ],
+              "text": "{{Investment_ReviewPeriod}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.Investment_ReviewPeriod }}"
+            },
+            {
+              "pageObjectIds": [
+                "g3883381cdb9_2_7"
+              ],
+              "text": "{{NextSteps_Text}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.NextSteps_Text }}"
+            },
+            {
+              "pageObjectIds": [
+                "g3883381cdb9_2_7"
+              ],
+              "text": "{{NextSteps_Heading}}",
+              "replaceText": "={{ $('AI Agent').item.json.output.NextSteps_Heading }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSlides",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        0
+      ],
+      "id": "a55bbb56-5c75-4a04-8677-7719e04c17d2",
+      "name": "Replace text in a presentation",
+      "credentials": {
+        "googleSlidesOAuth2Api": {
+          "id": "QZhKvPaL71WclQbJ",
+          "name": "Google Slides account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Proposal for  {{ $('AI Agent').item.json.output.ClientInfo_ClientName }} - Ashvattha Consulting",
+        "message": "=Hey,  As discussed, I'm sharing the proposal with you for {{ $('AI Agent').item.json.output.ClientInfo_ClientName }}.   It was great talking to you.  Please find the proposal below  https://docs.google.com/presentation/d/{{ $('Copy file').item.json.id }}  Feel free to let me know if you have any questions.  Regards, Mahesh",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1424,
+        0
+      ],
+      "id": "4d7224fd-a227-43a3-953e-ecf9e834f9da",
+      "name": "Create a draft",
+      "webhookId": "c850a008-5e3b-4a07-9bac-a43c99d8e9dc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "utuiaevTGXVsu3uL",
+          "name": "Gmail account 14"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Get a transcript": [
+      {
+        "json": {
+          "success": true,
+          "data": {
+            "id": "01K3R33R93V802MZ91E1ZD2YQH",
+            "sentences": [
+              {
+                "index": 0,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Hello.",
+                "start_time": 793.11,
+                "end_time": 793.43,
+                "ai_filters": {
+                  "text_cleanup": "Hello.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Hello."
+              },
+              {
+                "index": 1,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Hi.",
+                "start_time": 805.91,
+                "end_time": 806.39,
+                "ai_filters": {
+                  "text_cleanup": "Hi.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Hi."
+              },
+              {
+                "index": 2,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "I'll speak in English.",
+                "start_time": 807.03,
+                "end_time": 808.31,
+                "ai_filters": {
+                  "text_cleanup": "I'll speak in English.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "I'll speak in English."
+              },
+              {
+                "index": 3,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Yeah, yeah.",
+                "start_time": 808.87,
+                "end_time": 809.59,
+                "ai_filters": {
+                  "text_cleanup": "Yeah, yeah.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yeah, yeah."
+              },
+              {
+                "index": 4,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Because.",
+                "start_time": 811.75,
+                "end_time": 812.15,
+                "ai_filters": {
+                  "text_cleanup": "Because.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Because."
+              },
+              {
+                "index": 5,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Because the AI AI knows all languages, but I have not.",
+                "start_time": 812.55,
+                "end_time": 816.59,
+                "ai_filters": {
+                  "text_cleanup": "Because the AI AI knows all languages, but I have not.",
+                  "task": "Because the AI AI knows all languages, but I have not.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Because the AI AI knows all languages, but I have not."
+              },
+              {
+                "index": 6,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "I've only set it up for English as of now.",
+                "start_time": 816.59,
+                "end_time": 819.03,
+                "ai_filters": {
+                  "text_cleanup": "I've only set it up for English as of now.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "I've only set it up for English as of now."
+              },
+              {
+                "index": 7,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Otherwise it can understand all languages.",
+                "start_time": 820.14,
+                "end_time": 821.7,
+                "ai_filters": {
+                  "text_cleanup": "Otherwise it can understand all languages.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Otherwise it can understand all languages."
+              },
+              {
+                "index": 8,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "But I've just set it up in English as of now.",
+                "start_time": 821.7,
+                "end_time": 824.02,
+                "ai_filters": {
+                  "text_cleanup": "But I've just set it up in English as of now.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "But I've just set it up in English as of now."
+              },
+              {
+                "index": 9,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "I think Jyoti is also there on the meeting.",
+                "start_time": 824.02,
+                "end_time": 826.22,
+                "ai_filters": {
+                  "text_cleanup": "I think Jyoti is also there on the meeting.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "I think Jyoti is also there on the meeting."
+              },
+              {
+                "index": 10,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So we're going to talk very professional and very clean and decent.",
+                "start_time": 826.38,
+                "end_time": 829.98,
+                "ai_filters": {
+                  "text_cleanup": "So we're going to talk very professional and very clean and decent.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "So we're going to talk very professional and very clean and decent."
+              },
+              {
+                "index": 11,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So.",
+                "start_time": 834.38,
+                "end_time": 834.78,
+                "ai_filters": {
+                  "text_cleanup": "So.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So."
+              },
+              {
+                "index": 12,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "How are you?",
+                "start_time": 837.26,
+                "end_time": 837.98,
+                "ai_filters": {
+                  "text_cleanup": "How are you?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "How are you?",
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "How are you?"
+              },
+              {
+                "index": 13,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "I'm good.",
+                "start_time": 838.14,
+                "end_time": 838.66,
+                "ai_filters": {
+                  "text_cleanup": "I'm good.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "I'm good."
+              },
+              {
+                "index": 14,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "How are you, Jyoti?",
+                "start_time": 838.66,
+                "end_time": 839.58,
+                "ai_filters": {
+                  "text_cleanup": "How are you, Jyoti?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "How are you, Jyoti?",
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "How are you, Jyoti?"
+              },
+              {
+                "index": 15,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "I'm good.",
+                "start_time": 841.34,
+                "end_time": 841.86,
+                "ai_filters": {
+                  "text_cleanup": "I'm good.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "I'm good."
+              },
+              {
+                "index": 16,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "Salam.",
+                "start_time": 841.86,
+                "end_time": 842.26,
+                "ai_filters": {
+                  "text_cleanup": "Salam.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Salam."
+              },
+              {
+                "index": 17,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "I'm good.",
+                "start_time": 842.26,
+                "end_time": 842.7,
+                "ai_filters": {
+                  "text_cleanup": "I'm good.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "I'm good."
+              },
+              {
+                "index": 18,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Yeah.",
+                "start_time": 842.86,
+                "end_time": 843.34,
+                "ai_filters": {
+                  "text_cleanup": "Yeah.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yeah."
+              },
+              {
+                "index": 19,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Yeah.",
+                "start_time": 843.34,
+                "end_time": 843.82,
+                "ai_filters": {
+                  "text_cleanup": "Yeah.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yeah."
+              },
+              {
+                "index": 20,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "Cool.",
+                "start_time": 844.38,
+                "end_time": 844.78,
+                "ai_filters": {
+                  "text_cleanup": "Cool.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Cool."
+              },
+              {
+                "index": 21,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "We can start.",
+                "start_time": 844.78,
+                "end_time": 846.11,
+                "ai_filters": {
+                  "text_cleanup": "We can start.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "We can start."
+              },
+              {
+                "index": 22,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "You can start?",
+                "start_time": 847.07,
+                "end_time": 847.79,
+                "ai_filters": {
+                  "text_cleanup": "You can start?",
+                  "task": "You can start?",
+                  "pricing": null,
+                  "metric": null,
+                  "question": "You can start?",
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "You can start?"
+              },
+              {
+                "index": 23,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Yeah.",
+                "start_time": 851.39,
+                "end_time": 851.87,
+                "ai_filters": {
+                  "text_cleanup": "Yeah.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yeah."
+              },
+              {
+                "index": 24,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "What are you saying?",
+                "start_time": 852.35,
+                "end_time": 852.99,
+                "ai_filters": {
+                  "text_cleanup": "What are you saying?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "What are you saying?",
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "What are you saying?"
+              },
+              {
+                "index": 25,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Sorry.",
+                "start_time": 852.99,
+                "end_time": 853.47,
+                "ai_filters": {
+                  "text_cleanup": "Sorry.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "negative"
+                },
+                "text": "Sorry."
+              },
+              {
+                "index": 26,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Hello.",
+                "start_time": 856.75,
+                "end_time": 857.23,
+                "ai_filters": {
+                  "text_cleanup": "Hello.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Hello."
+              },
+              {
+                "index": 27,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "He's saying that we can start the professional meeting.",
+                "start_time": 857.47,
+                "end_time": 859.87,
+                "ai_filters": {
+                  "text_cleanup": "He's saying that we can start the professional meeting.",
+                  "task": "He's saying that we can start the professional meeting.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "He's saying that we can start the professional meeting."
+              },
+              {
+                "index": 28,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "That's what he's saying.",
+                "start_time": 859.87,
+                "end_time": 860.75,
+                "ai_filters": {
+                  "text_cleanup": "That's what he's saying.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "That's what he's saying."
+              },
+              {
+                "index": 29,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So I'll give you the demo of that mom agent.",
+                "start_time": 861.15,
+                "end_time": 864.43,
+                "ai_filters": {
+                  "text_cleanup": "So I'll give you the demo of that mom agent.",
+                  "task": "So I'll give you the demo of that mom agent.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So I'll give you the demo of that mom agent."
+              },
+              {
+                "index": 30,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "And so what happens is I just share what we have built.",
+                "start_time": 864.99,
+                "end_time": 868.47,
+                "ai_filters": {
+                  "text_cleanup": "And so what happens is I just share what we have built.",
+                  "task": "And so what happens is I just share what we have built.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "And so what happens is I just share what we have built."
+              },
+              {
+                "index": 31,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "I just show you what we build.",
+                "start_time": 868.47,
+                "end_time": 869.79,
+                "ai_filters": {
+                  "text_cleanup": "I just show you what we build.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "I just show you what we build."
+              },
+              {
+                "index": 32,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "What we have built is.",
+                "start_time": 872.88,
+                "end_time": 873.84,
+                "ai_filters": {
+                  "text_cleanup": "What we have built is.",
+                  "task": "What we have built is.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "What we have built is."
+              },
+              {
+                "index": 33,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This is something that we built.",
+                "start_time": 875.84,
+                "end_time": 876.96,
+                "ai_filters": {
+                  "text_cleanup": "This is something that we built.",
+                  "task": "This is something that we built.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "This is something that we built."
+              },
+              {
+                "index": 34,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "What happens is that it will take a transcript and then the AI agent will find out how we are talking, what we are talking, and then it will put in the draft.",
+                "start_time": 876.96,
+                "end_time": 885.36,
+                "ai_filters": {
+                  "text_cleanup": "What happens is that it will take a transcript and then the AI agent will find out how we are talking, what we are talking, and then it will put in the draft.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "What happens is that it will take a transcript and then the AI agent will find out how we are talking, what we are talking, and then it will put in the draft."
+              },
+              {
+                "index": 35,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It will put in the draft and it will keep in the draft.",
+                "start_time": 885.76,
+                "end_time": 888.08,
+                "ai_filters": {
+                  "text_cleanup": "It will put in the draft and it will keep in the draft.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It will put in the draft and it will keep in the draft."
+              },
+              {
+                "index": 36,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This is the level one.",
+                "start_time": 888.32,
+                "end_time": 890.32,
+                "ai_filters": {
+                  "text_cleanup": "This is the level one.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "This is the level one."
+              },
+              {
+                "index": 37,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It will take the transcript and it will put as a draft in the email.",
+                "start_time": 891.6,
+                "end_time": 894.48,
+                "ai_filters": {
+                  "text_cleanup": "It will take the transcript and it will put as a draft in the email.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It will take the transcript and it will put as a draft in the email."
+              },
+              {
+                "index": 38,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This can be email draft.",
+                "start_time": 895.04,
+                "end_time": 896.44,
+                "ai_filters": {
+                  "text_cleanup": "This can be email draft.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "This can be email draft."
+              },
+              {
+                "index": 39,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It can be changed to slides, it can be changed to Excel sheet.",
+                "start_time": 896.44,
+                "end_time": 900,
+                "ai_filters": {
+                  "text_cleanup": "It can be changed to slides, it can be changed to Excel sheet.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It can be changed to slides, it can be changed to Excel sheet."
+              },
+              {
+                "index": 40,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Everything can be done.",
+                "start_time": 900,
+                "end_time": 900.72,
+                "ai_filters": {
+                  "text_cleanup": "Everything can be done.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Everything can be done."
+              },
+              {
+                "index": 41,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Whatever can be done.",
+                "start_time": 901.08,
+                "end_time": 901.96,
+                "ai_filters": {
+                  "text_cleanup": "Whatever can be done.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Whatever can be done."
+              },
+              {
+                "index": 42,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So this is another setup.",
+                "start_time": 902.12,
+                "end_time": 903.64,
+                "ai_filters": {
+                  "text_cleanup": "So this is another setup.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So this is another setup."
+              },
+              {
+                "index": 43,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This is an additional setup that we've done.",
+                "start_time": 903.88,
+                "end_time": 905.64,
+                "ai_filters": {
+                  "text_cleanup": "This is an additional setup that we've done.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "This is an additional setup that we've done."
+              },
+              {
+                "index": 44,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This is for.",
+                "start_time": 905.64,
+                "end_time": 906.36,
+                "ai_filters": {
+                  "text_cleanup": "This is for.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "This is for."
+              },
+              {
+                "index": 45,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So when it's in the draft, then you may feel that you.",
+                "start_time": 907.8,
+                "end_time": 911,
+                "ai_filters": {
+                  "text_cleanup": "So when it's in the draft, then you may feel that you.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So when it's in the draft, then you may feel that you."
+              },
+              {
+                "index": 46,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Certain points the agent understood, certain points it did not understand.",
+                "start_time": 911.16,
+                "end_time": 915.48,
+                "ai_filters": {
+                  "text_cleanup": "Certain points the agent understood, certain points it did not understand.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Certain points the agent understood, certain points it did not understand."
+              },
+              {
+                "index": 47,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Because depending on whatever requirement that was given to you, you know what is the points that needs to be highlighted better.",
+                "start_time": 915.96,
+                "end_time": 921.72,
+                "ai_filters": {
+                  "text_cleanup": "Because depending on whatever requirement that was given to you, you know what is the points that needs to be highlighted better.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Because depending on whatever requirement that was given to you, you know what is the points that needs to be highlighted better."
+              },
+              {
+                "index": 48,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Even.",
+                "start_time": 921.96,
+                "end_time": 922.36,
+                "ai_filters": {
+                  "text_cleanup": "Even.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Even."
+              },
+              {
+                "index": 49,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Even though the meeting, the meeting, they may not have highlighted it, but you know that these are the points that maybe the CEO wants it.",
+                "start_time": 922.36,
+                "end_time": 927.8,
+                "ai_filters": {
+                  "text_cleanup": "Even though the meeting, the meeting, they may not have highlighted it, but you know that these are the points that maybe the CEO wants it.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Even though the meeting, the meeting, they may not have highlighted it, but you know that these are the points that maybe the CEO wants it."
+              },
+              {
+                "index": 50,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So you have to highlight it better.",
+                "start_time": 927.96,
+                "end_time": 929.24,
+                "ai_filters": {
+                  "text_cleanup": "So you have to highlight it better.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "So you have to highlight it better."
+              },
+              {
+                "index": 51,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So when you.",
+                "start_time": 929.69,
+                "end_time": 930.25,
+                "ai_filters": {
+                  "text_cleanup": "So when you.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So when you."
+              },
+              {
+                "index": 52,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "When you correct the draft and send an email, what happens is it will go and compare what it produced and what you changed.",
+                "start_time": 930.65,
+                "end_time": 939.29,
+                "ai_filters": {
+                  "text_cleanup": "When you correct the draft and send an email, what happens is it will go and compare what it produced and what you changed.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "When you correct the draft and send an email, what happens is it will go and compare what it produced and what you changed."
+              },
+              {
+                "index": 53,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "And then it will create a new format so that from the next time it will highlight the things that you wanted to highlight.",
+                "start_time": 939.77,
+                "end_time": 946.49,
+                "ai_filters": {
+                  "text_cleanup": "And then it will create a new format so that from the next time it will highlight the things that you wanted to highlight.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "And then it will create a new format so that from the next time it will highlight the things that you wanted to highlight."
+              },
+              {
+                "index": 54,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So as every time as you, you will get the draft in two minutes, every time you see the draft and then you correct the email and send the email every time, it'll self learn.",
+                "start_time": 947.45,
+                "end_time": 958.64,
+                "ai_filters": {
+                  "text_cleanup": "So as every time as you, you will get the draft in two minutes, every time you see the draft and then you correct the email and send the email every time, it'll self learn.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": "So as every time as you, you will get the draft in two minutes, every time you see the draft and then you correct the email and send the email every time, it'll self learn.",
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So as every time as you, you will get the draft in two minutes, every time you see the draft and then you correct the email and send the email every time, it'll self learn."
+              },
+              {
+                "index": 55,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So this is a self learning AI agent which will try to learn how you are sending the meetings, how you're attending meetings and sending meetings.",
+                "start_time": 958.64,
+                "end_time": 966.16,
+                "ai_filters": {
+                  "text_cleanup": "So this is a self learning AI agent which will try to learn how you are sending the meetings, how you're attending meetings and sending meetings.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So this is a self learning AI agent which will try to learn how you are sending the meetings, how you're attending meetings and sending meetings."
+              },
+              {
+                "index": 56,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Also another advantage is that you can understand sentiments.",
+                "start_time": 966.24,
+                "end_time": 969.44,
+                "ai_filters": {
+                  "text_cleanup": "Also another advantage is that you can understand sentiments.",
+                  "task": "Also another advantage is that you can understand sentiments.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Also another advantage is that you can understand sentiments."
+              },
+              {
+                "index": 57,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Whether the client was irritated, whether the client was happy, whether he was interested, whether it was neutral positive in general meetings.",
+                "start_time": 969.6,
+                "end_time": 977.04,
+                "ai_filters": {
+                  "text_cleanup": "Whether the client was irritated, whether the client was happy, whether he was interested, whether it was neutral positive in general meetings.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Whether the client was irritated, whether the client was happy, whether he was interested, whether it was neutral positive in general meetings."
+              },
+              {
+                "index": 58,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Also you can find out who is say for example.",
+                "start_time": 977.04,
+                "end_time": 979.6,
+                "ai_filters": {
+                  "text_cleanup": "Also you can find out who is say for example.",
+                  "task": "Also you can find out who is say for example.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Also you can find out who is say for example."
+              },
+              {
+                "index": 59,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So another say for example, some.",
+                "start_time": 979.6,
+                "end_time": 981.56,
+                "ai_filters": {
+                  "text_cleanup": "So another say for example, some.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So another say for example, some."
+              },
+              {
+                "index": 60,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Some people will talk, always talk negative in the meeting, but then they will do the work.",
+                "start_time": 981.56,
+                "end_time": 985.02,
+                "ai_filters": {
+                  "text_cleanup": "Some people will talk, always talk negative in the meeting, but then they will do the work.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "negative"
+                },
+                "text": "Some people will talk, always talk negative in the meeting, but then they will do the work."
+              },
+              {
+                "index": 61,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Some people will always talk positive in the meeting, but they will not do the work.",
+                "start_time": 985.02,
+                "end_time": 987.82,
+                "ai_filters": {
+                  "text_cleanup": "Some people will always talk positive in the meeting, but they will not do the work.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Some people will always talk positive in the meeting, but they will not do the work."
+              },
+              {
+                "index": 62,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So that also can be through the sentiment.",
+                "start_time": 987.98,
+                "end_time": 989.66,
+                "ai_filters": {
+                  "text_cleanup": "So that also can be through the sentiment.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So that also can be through the sentiment."
+              },
+              {
+                "index": 63,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It can be done instead of after draft, you can also send it to action point.",
+                "start_time": 989.66,
+                "end_time": 994.78,
+                "ai_filters": {
+                  "text_cleanup": "It can be done instead of after draft, you can also send it to action point.",
+                  "task": "It can be done instead of after draft, you can also send it to action point.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It can be done instead of after draft, you can also send it to action point."
+              },
+              {
+                "index": 64,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So then if people finish the action point, it will compare.",
+                "start_time": 995.58,
+                "end_time": 1000.38,
+                "ai_filters": {
+                  "text_cleanup": "So then if people finish the action point, it will compare.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So then if people finish the action point, it will compare."
+              },
+              {
+                "index": 65,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This guy was positive.",
+                "start_time": 1000.38,
+                "end_time": 1001.42,
+                "ai_filters": {
+                  "text_cleanup": "This guy was positive.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "This guy was positive."
+              },
+              {
+                "index": 66,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "He finished the action point.",
+                "start_time": 1001.42,
+                "end_time": 1002.54,
+                "ai_filters": {
+                  "text_cleanup": "He finished the action point.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "He finished the action point."
+              },
+              {
+                "index": 67,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Okay, this is the.",
+                "start_time": 1002.54,
+                "end_time": 1003.26,
+                "ai_filters": {
+                  "text_cleanup": "Okay, this is the.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Okay, this is the."
+              },
+              {
+                "index": 68,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This is how this guy is.",
+                "start_time": 1003.42,
+                "end_time": 1004.62,
+                "ai_filters": {
+                  "text_cleanup": "This is how this guy is.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "This is how this guy is."
+              },
+              {
+                "index": 69,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This.",
+                "start_time": 1004.62,
+                "end_time": 1005.02,
+                "ai_filters": {
+                  "text_cleanup": "This.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "This."
+              },
+              {
+                "index": 70,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This guy is negative, but still he finished it.",
+                "start_time": 1005.02,
+                "end_time": 1007.14,
+                "ai_filters": {
+                  "text_cleanup": "This guy is negative, but still he finished it.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "negative"
+                },
+                "text": "This guy is negative, but still he finished it."
+              },
+              {
+                "index": 71,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So this is how he is.",
+                "start_time": 1007.14,
+                "end_time": 1008.14,
+                "ai_filters": {
+                  "text_cleanup": "So this is how he is.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So this is how he is."
+              },
+              {
+                "index": 72,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This guy is positive, but he's not finished yet.",
+                "start_time": 1008.22,
+                "end_time": 1010.1,
+                "ai_filters": {
+                  "text_cleanup": "This guy is positive, but he's not finished yet.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "This guy is positive, but he's not finished yet."
+              },
+              {
+                "index": 73,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So this is how it is.",
+                "start_time": 1010.1,
+                "end_time": 1010.9,
+                "ai_filters": {
+                  "text_cleanup": "So this is how it is.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So this is how it is."
+              },
+              {
+                "index": 74,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So it will also understand sentiment.",
+                "start_time": 1010.9,
+                "end_time": 1012.62,
+                "ai_filters": {
+                  "text_cleanup": "So it will also understand sentiment.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So it will also understand sentiment."
+              },
+              {
+                "index": 75,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Not set it up here, but that is one option that can be done.",
+                "start_time": 1012.92,
+                "end_time": 1015.88,
+                "ai_filters": {
+                  "text_cleanup": "Not set it up here, but that is one option that can be done.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": "Not set it up here, but that is one option that can be done.",
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Not set it up here, but that is one option that can be done."
+              },
+              {
+                "index": 76,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "As of now we've done a simple thing which is somebody else also had asked this.",
+                "start_time": 1016.04,
+                "end_time": 1020.68,
+                "ai_filters": {
+                  "text_cleanup": "As of now we've done a simple thing which is somebody else also had asked this.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "As of now we've done a simple thing which is somebody else also had asked this."
+              },
+              {
+                "index": 77,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It'll go to the draft.",
+                "start_time": 1020.76,
+                "end_time": 1021.96,
+                "ai_filters": {
+                  "text_cleanup": "It'll go to the draft.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It'll go to the draft."
+              },
+              {
+                "index": 78,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "You correct the draft and you send the email.",
+                "start_time": 1021.96,
+                "end_time": 1023.72,
+                "ai_filters": {
+                  "text_cleanup": "You correct the draft and you send the email.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "You correct the draft and you send the email."
+              },
+              {
+                "index": 79,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It will study the email and it will update and start learning how you write and start learning what points you take from the meeting and then it'll kind of send it to you.",
+                "start_time": 1024.04,
+                "end_time": 1033.72,
+                "ai_filters": {
+                  "text_cleanup": "It will study the email and it will update and start learning how you write and start learning what points you take from the meeting and then it'll kind of send it to you.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "It will study the email and it will update and start learning how you write and start learning what points you take from the meeting and then it'll kind of send it to you."
+              },
+              {
+                "index": 80,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Yeah, so that is how it is.",
+                "start_time": 1035.08,
+                "end_time": 1036.6,
+                "ai_filters": {
+                  "text_cleanup": "Yeah, so that is how it is.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yeah, so that is how it is."
+              },
+              {
+                "index": 81,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So I'll go to the draft.",
+                "start_time": 1037.08,
+                "end_time": 1039,
+                "ai_filters": {
+                  "text_cleanup": "So I'll go to the draft.",
+                  "task": "So I'll go to the draft.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So I'll go to the draft."
+              },
+              {
+                "index": 82,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "You.",
+                "start_time": 1040.96,
+                "end_time": 1041.08,
+                "ai_filters": {
+                  "text_cleanup": "You.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "You."
+              },
+              {
+                "index": 83,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Can talk something because the understand your questions and it'll put some jot out some points.",
+                "start_time": 1041.08,
+                "end_time": 1047.92,
+                "ai_filters": {
+                  "text_cleanup": "Can talk something because the understand your questions and it'll put some jot out some points.",
+                  "task": "Can talk something because the understand your questions and it'll put some jot out some points.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Can talk something because the understand your questions and it'll put some jot out some points."
+              },
+              {
+                "index": 84,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Do you have any questions?",
+                "start_time": 1047.92,
+                "end_time": 1048.96,
+                "ai_filters": {
+                  "text_cleanup": "Do you have any questions?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "Do you have any questions?",
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Do you have any questions?"
+              },
+              {
+                "index": 85,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Yeah, so I have understood the process, but the thing is now currently we are using teams for the meeting and teams is also generating some.",
+                "start_time": 1050.32,
+                "end_time": 1060.8,
+                "ai_filters": {
+                  "text_cleanup": "Yeah, so I have understood the process, but the thing is now currently we are using teams for the meeting and teams is also generating some.",
+                  "task": "Yeah, so I have understood the process, but the thing is now currently we are using teams for the meeting and teams is also generating some.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yeah, so I have understood the process, but the thing is now currently we are using teams for the meeting and teams is also generating some."
+              },
+              {
+                "index": 86,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "No, can you hear me now?",
+                "start_time": 1066.01,
+                "end_time": 1071.37,
+                "ai_filters": {
+                  "text_cleanup": "No, can you hear me now?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "No, can you hear me now?",
+                  "date_and_time": null,
+                  "sentiment": "negative"
+                },
+                "text": "No, can you hear me now?"
+              },
+              {
+                "index": 87,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Yeah, yeah.",
+                "start_time": 1071.61,
+                "end_time": 1072.73,
+                "ai_filters": {
+                  "text_cleanup": "Yeah, yeah.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yeah, yeah."
+              },
+              {
+                "index": 88,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Okay.",
+                "start_time": 1073.77,
+                "end_time": 1074.25,
+                "ai_filters": {
+                  "text_cleanup": "Okay.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Okay."
+              },
+              {
+                "index": 89,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "So now actually currently we are using teams for all the meetings.",
+                "start_time": 1074.25,
+                "end_time": 1078.29,
+                "ai_filters": {
+                  "text_cleanup": "So now actually currently we are using teams for all the meetings.",
+                  "task": "So now actually currently we are using teams for all the meetings.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So now actually currently we are using teams for all the meetings."
+              },
+              {
+                "index": 90,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "And now teams is also generating the mom on its own and it's sending reports to all.",
+                "start_time": 1078.29,
+                "end_time": 1085.13,
+                "ai_filters": {
+                  "text_cleanup": "And now teams is also generating the mom on its own and it's sending reports to all.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "And now teams is also generating the mom on its own and it's sending reports to all."
+              },
+              {
+                "index": 91,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "So what is the difference between the team's MO and this aim this is.",
+                "start_time": 1085.61,
+                "end_time": 1092.37,
+                "ai_filters": {
+                  "text_cleanup": "So what is the difference between the team's MO and this aim this is.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So what is the difference between the team's MO and this aim this is."
+              },
+              {
+                "index": 92,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "In this AI agent is say for example, teams have a set of.",
+                "start_time": 1092.37,
+                "end_time": 1096.21,
+                "ai_filters": {
+                  "text_cleanup": "In this AI agent is say for example, teams have a set of.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "In this AI agent is say for example, teams have a set of."
+              },
+              {
+                "index": 93,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "That's the biggest difference.",
+                "start_time": 1096.21,
+                "end_time": 1097.85,
+                "ai_filters": {
+                  "text_cleanup": "That's the biggest difference.",
+                  "task": "That's the biggest difference.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "That's the biggest difference."
+              },
+              {
+                "index": 94,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Okay.",
+                "start_time": 1097.85,
+                "end_time": 1098.21,
+                "ai_filters": {
+                  "text_cleanup": "Okay.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Okay."
+              },
+              {
+                "index": 95,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "The teams have a set of things.",
+                "start_time": 1098.21,
+                "end_time": 1101.29,
+                "ai_filters": {
+                  "text_cleanup": "The teams have a set of things.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "The teams have a set of things."
+              },
+              {
+                "index": 96,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It will find out because it's got a fixed prompt.",
+                "start_time": 1101.29,
+                "end_time": 1104.09,
+                "ai_filters": {
+                  "text_cleanup": "It will find out because it's got a fixed prompt.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It will find out because it's got a fixed prompt."
+              },
+              {
+                "index": 97,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So it will only do the MOM in only one way.",
+                "start_time": 1104.49,
+                "end_time": 1107.37,
+                "ai_filters": {
+                  "text_cleanup": "So it will only do the MOM in only one way.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So it will only do the MOM in only one way."
+              },
+              {
+                "index": 98,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Every time you have to go back and edit it and send it.",
+                "start_time": 1107.37,
+                "end_time": 1109.69,
+                "ai_filters": {
+                  "text_cleanup": "Every time you have to go back and edit it and send it.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Every time you have to go back and edit it and send it."
+              },
+              {
+                "index": 99,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It will not self learn from whatever that you're doing.",
+                "start_time": 1110.01,
+                "end_time": 1112.81,
+                "ai_filters": {
+                  "text_cleanup": "It will not self learn from whatever that you're doing.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It will not self learn from whatever that you're doing."
+              },
+              {
+                "index": 100,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Plus certain meetings you need to have different meetings will have different MOM formats.",
+                "start_time": 1113.13,
+                "end_time": 1118.49,
+                "ai_filters": {
+                  "text_cleanup": "Plus certain meetings you need to have different meetings will have different MOM formats.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Plus certain meetings you need to have different meetings will have different MOM formats."
+              },
+              {
+                "index": 101,
+                "speaker_name": "Jyoti",
+                "speaker_id": 2,
+                "raw_text": "Right?",
+                "start_time": 1119.36,
+                "end_time": 1119.6,
+                "ai_filters": {
+                  "text_cleanup": "Right?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "Right?",
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Right?"
+              },
+              {
+                "index": 102,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So here you can production meeting, you can define the format.",
+                "start_time": 1119.76,
+                "end_time": 1124.56,
+                "ai_filters": {
+                  "text_cleanup": "So here you can production meeting, you can define the format.",
+                  "task": "So here you can production meeting, you can define the format.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So here you can production meeting, you can define the format."
+              },
+              {
+                "index": 103,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It will come as a production meeting format.",
+                "start_time": 1124.8,
+                "end_time": 1126.72,
+                "ai_filters": {
+                  "text_cleanup": "It will come as a production meeting format.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It will come as a production meeting format."
+              },
+              {
+                "index": 104,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Sales meeting, you.",
+                "start_time": 1127.36,
+                "end_time": 1128.56,
+                "ai_filters": {
+                  "text_cleanup": "Sales meeting, you.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Sales meeting, you."
+              },
+              {
+                "index": 105,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "You wanted slides, right?",
+                "start_time": 1128.56,
+                "end_time": 1129.76,
+                "ai_filters": {
+                  "text_cleanup": "You wanted slides, right?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "You wanted slides, right?",
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "You wanted slides, right?"
+              },
+              {
+                "index": 106,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So sales meeting, you can define that.",
+                "start_time": 1129.76,
+                "end_time": 1131.32,
+                "ai_filters": {
+                  "text_cleanup": "So sales meeting, you can define that.",
+                  "task": "So sales meeting, you can define that.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So sales meeting, you can define that."
+              },
+              {
+                "index": 107,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It's a slides.",
+                "start_time": 1131.32,
+                "end_time": 1131.92,
+                "ai_filters": {
+                  "text_cleanup": "It's a slides.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It's a slides."
+              },
+              {
+                "index": 108,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It will come as slides.",
+                "start_time": 1131.92,
+                "end_time": 1132.88,
+                "ai_filters": {
+                  "text_cleanup": "It will come as slides.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It will come as slides."
+              },
+              {
+                "index": 109,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So depending on the meeting.",
+                "start_time": 1133.36,
+                "end_time": 1135.6,
+                "ai_filters": {
+                  "text_cleanup": "So depending on the meeting.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So depending on the meeting."
+              },
+              {
+                "index": 110,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So certain clients, they want moms in a particular format.",
+                "start_time": 1135.68,
+                "end_time": 1139.56,
+                "ai_filters": {
+                  "text_cleanup": "So certain clients, they want moms in a particular format.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "So certain clients, they want moms in a particular format."
+              },
+              {
+                "index": 111,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So depending on the end user the clients or whatever.",
+                "start_time": 1139.56,
+                "end_time": 1143.68,
+                "ai_filters": {
+                  "text_cleanup": "So depending on the end user the clients or whatever.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So depending on the end user the clients or whatever."
+              },
+              {
+                "index": 112,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Depending on the nature of the meeting.",
+                "start_time": 1143.76,
+                "end_time": 1145.36,
+                "ai_filters": {
+                  "text_cleanup": "Depending on the nature of the meeting.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Depending on the nature of the meeting."
+              },
+              {
+                "index": 113,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "You can define different exactly how you want the output, how output you want.",
+                "start_time": 1145.77,
+                "end_time": 1150.57,
+                "ai_filters": {
+                  "text_cleanup": "You can define different exactly how you want the output, how output you want.",
+                  "task": "You can define different exactly how you want the output, how output you want.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "You can define different exactly how you want the output, how output you want."
+              },
+              {
+                "index": 114,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "And it will create create it on the draft.",
+                "start_time": 1150.65,
+                "end_time": 1152.69,
+                "ai_filters": {
+                  "text_cleanup": "And it will create create it on the draft.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "And it will create create it on the draft."
+              },
+              {
+                "index": 115,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So that is the difference which any generic.",
+                "start_time": 1152.69,
+                "end_time": 1156.37,
+                "ai_filters": {
+                  "text_cleanup": "So that is the difference which any generic.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So that is the difference which any generic."
+              },
+              {
+                "index": 116,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So even Zoom has transcript and an mlm.",
+                "start_time": 1156.37,
+                "end_time": 1159.53,
+                "ai_filters": {
+                  "text_cleanup": "So even Zoom has transcript and an mlm.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So even Zoom has transcript and an mlm."
+              },
+              {
+                "index": 117,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "There are other providers also.",
+                "start_time": 1159.77,
+                "end_time": 1161.17,
+                "ai_filters": {
+                  "text_cleanup": "There are other providers also.",
+                  "task": "There are other providers also.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "There are other providers also."
+              },
+              {
+                "index": 118,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "There are many providers, but none of the providers.",
+                "start_time": 1161.17,
+                "end_time": 1163.33,
+                "ai_filters": {
+                  "text_cleanup": "There are many providers, but none of the providers.",
+                  "task": "There are many providers, but none of the providers.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "There are many providers, but none of the providers."
+              },
+              {
+                "index": 119,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It's not customized to your business.",
+                "start_time": 1163.33,
+                "end_time": 1164.97,
+                "ai_filters": {
+                  "text_cleanup": "It's not customized to your business.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It's not customized to your business."
+              },
+              {
+                "index": 120,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So this will be like.",
+                "start_time": 1165.53,
+                "end_time": 1166.85,
+                "ai_filters": {
+                  "text_cleanup": "So this will be like.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "So this will be like."
+              },
+              {
+                "index": 121,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It's like difference between a website template and then custom design website.",
+                "start_time": 1166.85,
+                "end_time": 1170.17,
+                "ai_filters": {
+                  "text_cleanup": "It's like difference between a website template and then custom design website.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "It's like difference between a website template and then custom design website."
+              },
+              {
+                "index": 122,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This will exactly customize.",
+                "start_time": 1170.57,
+                "end_time": 1172.49,
+                "ai_filters": {
+                  "text_cleanup": "This will exactly customize.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "This will exactly customize."
+              },
+              {
+                "index": 123,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "We can have different formats for different clients, different formats for different departments, different formats for different people in the organization.",
+                "start_time": 1172.75,
+                "end_time": 1179.43,
+                "ai_filters": {
+                  "text_cleanup": "We can have different formats for different clients, different formats for different departments, different formats for different people in the organization.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "We can have different formats for different clients, different formats for different departments, different formats for different people in the organization."
+              },
+              {
+                "index": 124,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Like this ex boss.",
+                "start_time": 1179.43,
+                "end_time": 1180.75,
+                "ai_filters": {
+                  "text_cleanup": "Like this ex boss.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Like this ex boss."
+              },
+              {
+                "index": 125,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Your boss wants it in a particular format.",
+                "start_time": 1180.99,
+                "end_time": 1182.51,
+                "ai_filters": {
+                  "text_cleanup": "Your boss wants it in a particular format.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Your boss wants it in a particular format."
+              },
+              {
+                "index": 126,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "You would have set it in a particular format.",
+                "start_time": 1182.51,
+                "end_time": 1183.87,
+                "ai_filters": {
+                  "text_cleanup": "You would have set it in a particular format.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "You would have set it in a particular format."
+              },
+              {
+                "index": 127,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "And what's that called?",
+                "start_time": 1184.03,
+                "end_time": 1185.71,
+                "ai_filters": {
+                  "text_cleanup": "And what's that called?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "And what's that called?",
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "And what's that called?"
+              },
+              {
+                "index": 128,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "What did you say that that one notes.",
+                "start_time": 1185.95,
+                "end_time": 1187.87,
+                "ai_filters": {
+                  "text_cleanup": "What did you say that that one notes.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "What did you say that that one notes."
+              },
+              {
+                "index": 129,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "No, what's it called?",
+                "start_time": 1187.87,
+                "end_time": 1190.91,
+                "ai_filters": {
+                  "text_cleanup": "No, what's it called?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "No, what's it called?",
+                  "date_and_time": null,
+                  "sentiment": "negative"
+                },
+                "text": "No, what's it called?"
+              },
+              {
+                "index": 130,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Microsoft Teams.",
+                "start_time": 1191.23,
+                "end_time": 1193.19,
+                "ai_filters": {
+                  "text_cleanup": "Microsoft Teams.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Microsoft Teams."
+              },
+              {
+                "index": 131,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Teams.",
+                "start_time": 1193.19,
+                "end_time": 1193.55,
+                "ai_filters": {
+                  "text_cleanup": "Teams.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Teams."
+              },
+              {
+                "index": 132,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Teams Teams.",
+                "start_time": 1194.11,
+                "end_time": 1195.07,
+                "ai_filters": {
+                  "text_cleanup": "Teams Teams.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Teams Teams."
+              },
+              {
+                "index": 133,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Microsoft Teams.",
+                "start_time": 1195.39,
+                "end_time": 1196.27,
+                "ai_filters": {
+                  "text_cleanup": "Microsoft Teams.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Microsoft Teams."
+              },
+              {
+                "index": 134,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Microsoft Teams will not give that format.",
+                "start_time": 1196.27,
+                "end_time": 1200.6,
+                "ai_filters": {
+                  "text_cleanup": "Microsoft Teams will not give that format.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Microsoft Teams will not give that format."
+              },
+              {
+                "index": 135,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It will give you a standard set of format which is already already been pre predefined and it will only give.",
+                "start_time": 1200.6,
+                "end_time": 1206.72,
+                "ai_filters": {
+                  "text_cleanup": "It will give you a standard set of format which is already already been pre predefined and it will only give.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It will give you a standard set of format which is already already been pre predefined and it will only give."
+              },
+              {
+                "index": 136,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So every time you'll have to go and maybe it's like a generic, like a charge GPT.",
+                "start_time": 1206.72,
+                "end_time": 1210.6,
+                "ai_filters": {
+                  "text_cleanup": "So every time you'll have to go and maybe it's like a generic, like a charge GPT.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "So every time you'll have to go and maybe it's like a generic, like a charge GPT."
+              },
+              {
+                "index": 137,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "They've just added something like a charge GPT to them.",
+                "start_time": 1210.6,
+                "end_time": 1212.76,
+                "ai_filters": {
+                  "text_cleanup": "They've just added something like a charge GPT to them.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "They've just added something like a charge GPT to them."
+              },
+              {
+                "index": 138,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So it will just give you a generic output that then you'll have to sit and send it.",
+                "start_time": 1212.84,
+                "end_time": 1217.88,
+                "ai_filters": {
+                  "text_cleanup": "So it will just give you a generic output that then you'll have to sit and send it.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So it will just give you a generic output that then you'll have to sit and send it."
+              },
+              {
+                "index": 139,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "That's the only difference.",
+                "start_time": 1217.88,
+                "end_time": 1219.12,
+                "ai_filters": {
+                  "text_cleanup": "That's the only difference.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "That's the only difference."
+              },
+              {
+                "index": 140,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "This is like custom design website.",
+                "start_time": 1219.12,
+                "end_time": 1221.04,
+                "ai_filters": {
+                  "text_cleanup": "This is like custom design website.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "This is like custom design website."
+              },
+              {
+                "index": 141,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "That's like a template website.",
+                "start_time": 1221.04,
+                "end_time": 1222.76,
+                "ai_filters": {
+                  "text_cleanup": "That's like a template website.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "That's like a template website."
+              },
+              {
+                "index": 142,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Okay, so so and how do.",
+                "start_time": 1226.29,
+                "end_time": 1230.49,
+                "ai_filters": {
+                  "text_cleanup": "Okay, so so and how do.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Okay, so so and how do."
+              },
+              {
+                "index": 143,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "How can we use this draft or some.",
+                "start_time": 1230.49,
+                "end_time": 1233.45,
+                "ai_filters": {
+                  "text_cleanup": "How can we use this draft or some.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "How can we use this draft or some."
+              },
+              {
+                "index": 144,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "So so this we can amend the draft and we can send it to the client.",
+                "start_time": 1233.45,
+                "end_time": 1236.53,
+                "ai_filters": {
+                  "text_cleanup": "So so this we can amend the draft and we can send it to the client.",
+                  "task": "So so this we can amend the draft and we can send it to the client.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So so this we can amend the draft and we can send it to the client."
+              },
+              {
+                "index": 145,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Send it to the client in the draft.",
+                "start_time": 1236.77,
+                "end_time": 1238.61,
+                "ai_filters": {
+                  "text_cleanup": "Send it to the client in the draft.",
+                  "task": "Send it to the client in the draft.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Send it to the client in the draft."
+              },
+              {
+                "index": 146,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "See say for example, it will come with the draft.",
+                "start_time": 1238.61,
+                "end_time": 1240.57,
+                "ai_filters": {
+                  "text_cleanup": "See say for example, it will come with the draft.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "See say for example, it will come with the draft."
+              },
+              {
+                "index": 147,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "I've done some test.",
+                "start_time": 1240.57,
+                "end_time": 1241.41,
+                "ai_filters": {
+                  "text_cleanup": "I've done some test.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "I've done some test."
+              },
+              {
+                "index": 148,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "It will come with the draft.",
+                "start_time": 1241.65,
+                "end_time": 1242.73,
+                "ai_filters": {
+                  "text_cleanup": "It will come with the draft.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "It will come with the draft."
+              },
+              {
+                "index": 149,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Right now there is no draft 26, it's there.",
+                "start_time": 1242.73,
+                "end_time": 1245.01,
+                "ai_filters": {
+                  "text_cleanup": "Right now there is no draft 26, it's there.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": "Right now there is no draft 26, it's there.",
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "negative"
+                },
+                "text": "Right now there is no draft 26, it's there."
+              },
+              {
+                "index": 150,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Today is 28th.",
+                "start_time": 1245.01,
+                "end_time": 1246.05,
+                "ai_filters": {
+                  "text_cleanup": "Today is 28th.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": "Today is 28th.",
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Today is 28th."
+              },
+              {
+                "index": 151,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "The moment we close the meeting, it will come on the draft.",
+                "start_time": 1246.13,
+                "end_time": 1248.17,
+                "ai_filters": {
+                  "text_cleanup": "The moment we close the meeting, it will come on the draft.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "The moment we close the meeting, it will come on the draft."
+              },
+              {
+                "index": 152,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So we will go out of the meeting and you come that meet Mr. Account and then we'll go out and then immediately come on meet Mr. Then I'll show you how it look in the draft.",
+                "start_time": 1248.17,
+                "end_time": 1257.63,
+                "ai_filters": {
+                  "text_cleanup": "So we will go out of the meeting and you come that meet Mr. Account and then we'll go out and then immediately come on meet Mr. Then I'll show you how it look in the draft.",
+                  "task": "So we will go out of the meeting and you come that meet Mr. Account and then we'll go out and then immediately come on meet Mr. Then I'll show you how it look in the draft.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So we will go out of the meeting and you come that meet Mr. Account and then we'll go out and then immediately come on meet Mr. Then I'll show you how it look in the draft."
+              },
+              {
+                "index": 153,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So this draft I have defined.",
+                "start_time": 1257.63,
+                "end_time": 1259.47,
+                "ai_filters": {
+                  "text_cleanup": "So this draft I have defined.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So this draft I have defined."
+              },
+              {
+                "index": 154,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "I said that I wanted it like this because we are showing demos to other people.",
+                "start_time": 1259.63,
+                "end_time": 1264.95,
+                "ai_filters": {
+                  "text_cleanup": "I said that I wanted it like this because we are showing demos to other people.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "I said that I wanted it like this because we are showing demos to other people."
+              },
+              {
+                "index": 155,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Also somebody had asked me that I want exactly this format.",
+                "start_time": 1264.95,
+                "end_time": 1267.83,
+                "ai_filters": {
+                  "text_cleanup": "Also somebody had asked me that I want exactly this format.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Also somebody had asked me that I want exactly this format."
+              },
+              {
+                "index": 156,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "And therefore we have defined.",
+                "start_time": 1267.83,
+                "end_time": 1269.15,
+                "ai_filters": {
+                  "text_cleanup": "And therefore we have defined.",
+                  "task": "And therefore we have defined.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "And therefore we have defined."
+              },
+              {
+                "index": 157,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So in your business generic moms are you cannot customize.",
+                "start_time": 1269.39,
+                "end_time": 1275.83,
+                "ai_filters": {
+                  "text_cleanup": "So in your business generic moms are you cannot customize.",
+                  "task": "So in your business generic moms are you cannot customize.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So in your business generic moms are you cannot customize."
+              },
+              {
+                "index": 158,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So every business is different, every department is different, every CEO is different.",
+                "start_time": 1275.83,
+                "end_time": 1280.08,
+                "ai_filters": {
+                  "text_cleanup": "So every business is different, every department is different, every CEO is different.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So every business is different, every department is different, every CEO is different."
+              },
+              {
+                "index": 159,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So according to them we can define predefined.",
+                "start_time": 1280.16,
+                "end_time": 1283.08,
+                "ai_filters": {
+                  "text_cleanup": "So according to them we can define predefined.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So according to them we can define predefined."
+              },
+              {
+                "index": 160,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "If you give me your whatever the mom that say for example, your CEO wants, if you give me that format, we will study that format and we will create.",
+                "start_time": 1283.08,
+                "end_time": 1292.16,
+                "ai_filters": {
+                  "text_cleanup": "If you give me your whatever the mom that say for example, your CEO wants, if you give me that format, we will study that format and we will create.",
+                  "task": "If you give me your whatever the mom that say for example, your CEO wants, if you give me that format, we will study that format and we will create.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "If you give me your whatever the mom that say for example, your CEO wants, if you give me that format, we will study that format and we will create."
+              },
+              {
+                "index": 161,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "We will tell the agent that this is the output that we want for this particular person and it will exactly give that format.",
+                "start_time": 1292.16,
+                "end_time": 1298.6,
+                "ai_filters": {
+                  "text_cleanup": "We will tell the agent that this is the output that we want for this particular person and it will exactly give that format.",
+                  "task": "We will tell the agent that this is the output that we want for this particular person and it will exactly give that format.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "We will tell the agent that this is the output that we want for this particular person and it will exactly give that format."
+              },
+              {
+                "index": 162,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So that's the thing, I think I.",
+                "start_time": 1298.6,
+                "end_time": 1300.4,
+                "ai_filters": {
+                  "text_cleanup": "So that's the thing, I think I.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So that's the thing, I think I."
+              },
+              {
+                "index": 163,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "So we can.",
+                "start_time": 1300.72,
+                "end_time": 1301.36,
+                "ai_filters": {
+                  "text_cleanup": "So we can.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So we can."
+              },
+              {
+                "index": 164,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Yeah, yeah, okay, fine.",
+                "start_time": 1301.52,
+                "end_time": 1302.64,
+                "ai_filters": {
+                  "text_cleanup": "Yeah, yeah, okay, fine.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yeah, yeah, okay, fine."
+              },
+              {
+                "index": 165,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "So we can be like.",
+                "start_time": 1302.64,
+                "end_time": 1303.76,
+                "ai_filters": {
+                  "text_cleanup": "So we can be like.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "So we can be like."
+              },
+              {
+                "index": 166,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "We can, we can, we can create different formats.",
+                "start_time": 1303.92,
+                "end_time": 1306.64,
+                "ai_filters": {
+                  "text_cleanup": "We can, we can, we can create different formats.",
+                  "task": "We can, we can, we can create different formats.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "We can, we can, we can create different formats."
+              },
+              {
+                "index": 167,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Depends upon the meeting.",
+                "start_time": 1307.39,
+                "end_time": 1308.27,
+                "ai_filters": {
+                  "text_cleanup": "Depends upon the meeting.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Depends upon the meeting."
+              },
+              {
+                "index": 168,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "So we need a different format for sales.",
+                "start_time": 1308.51,
+                "end_time": 1310.55,
+                "ai_filters": {
+                  "text_cleanup": "So we need a different format for sales.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So we need a different format for sales."
+              },
+              {
+                "index": 169,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "We need different format.",
+                "start_time": 1310.55,
+                "end_time": 1311.55,
+                "ai_filters": {
+                  "text_cleanup": "We need different format.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "We need different format."
+              },
+              {
+                "index": 170,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Yes.",
+                "start_time": 1312.59,
+                "end_time": 1312.99,
+                "ai_filters": {
+                  "text_cleanup": "Yes.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yes."
+              },
+              {
+                "index": 171,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "And different outputs also.",
+                "start_time": 1312.99,
+                "end_time": 1314.47,
+                "ai_filters": {
+                  "text_cleanup": "And different outputs also.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "And different outputs also."
+              },
+              {
+                "index": 172,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "We can either put it on draft, we can put it on a Doc, we can put it on an Excel Sheet Sheet.",
+                "start_time": 1314.47,
+                "end_time": 1319.99,
+                "ai_filters": {
+                  "text_cleanup": "We can either put it on draft, we can put it on a Doc, we can put it on an Excel Sheet Sheet.",
+                  "task": "We can either put it on draft, we can put it on a Doc, we can put it on an Excel Sheet Sheet.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "We can either put it on draft, we can put it on a Doc, we can put it on an Excel Sheet Sheet."
+              },
+              {
+                "index": 173,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Google Sheet, not Excel Sheet, Google Sheet.",
+                "start_time": 1319.99,
+                "end_time": 1321.79,
+                "ai_filters": {
+                  "text_cleanup": "Google Sheet, not Excel Sheet, Google Sheet.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Google Sheet, not Excel Sheet, Google Sheet."
+              },
+              {
+                "index": 174,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "And we can put it on, we can put it on, I think Excel Sheet also you can do, we can put it on Excel sheet means it'll go to the Excel sheet and it will get downloaded in one drive.",
+                "start_time": 1322.27,
+                "end_time": 1332.83,
+                "ai_filters": {
+                  "text_cleanup": "And we can put it on, we can put it on, I think Excel Sheet also you can do, we can put it on Excel sheet means it'll go to the Excel sheet and it will get downloaded in one drive.",
+                  "task": "And we can put it on, we can put it on, I think Excel Sheet also you can do, we can put it on Excel sheet means it'll go to the Excel sheet and it will get downloaded in one drive.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "And we can put it on, we can put it on, I think Excel Sheet also you can do, we can put it on Excel sheet means it'll go to the Excel sheet and it will get downloaded in one drive."
+              },
+              {
+                "index": 175,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So you can go to the drive and double click it.",
+                "start_time": 1333.28,
+                "end_time": 1335.44,
+                "ai_filters": {
+                  "text_cleanup": "So you can go to the drive and double click it.",
+                  "task": "So you can go to the drive and double click it.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So you can go to the drive and double click it."
+              },
+              {
+                "index": 176,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So and we can do it on a slides.",
+                "start_time": 1335.44,
+                "end_time": 1336.96,
+                "ai_filters": {
+                  "text_cleanup": "So and we can do it on a slides.",
+                  "task": "So and we can do it on a slides.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So and we can do it on a slides."
+              },
+              {
+                "index": 177,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So Slides, Google Doc, Google Sheets and email Draft.",
+                "start_time": 1337.28,
+                "end_time": 1343.68,
+                "ai_filters": {
+                  "text_cleanup": "So Slides, Google Doc, Google Sheets and email Draft.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So Slides, Google Doc, Google Sheets and email Draft."
+              },
+              {
+                "index": 178,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So all of the four things, either Outlook or Gmail, either Outlook or Gmail, either Google or Microsoft software, either.",
+                "start_time": 1343.68,
+                "end_time": 1351.44,
+                "ai_filters": {
+                  "text_cleanup": "So all of the four things, either Outlook or Gmail, either Outlook or Gmail, either Google or Microsoft software, either.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": "So all of the four things, either Outlook or Gmail, either Outlook or Gmail, either Google or Microsoft software, either.",
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So all of the four things, either Outlook or Gmail, either Outlook or Gmail, either Google or Microsoft software, either."
+              },
+              {
+                "index": 179,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Whatever output you want, it will go and study the call and then it will fetch the data and put it in the data.",
+                "start_time": 1351.44,
+                "end_time": 1358.08,
+                "ai_filters": {
+                  "text_cleanup": "Whatever output you want, it will go and study the call and then it will fetch the data and put it in the data.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Whatever output you want, it will go and study the call and then it will fetch the data and put it in the data."
+              },
+              {
+                "index": 180,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Okay, so now, so now we are, we are moving all our business activities to Zoho.",
+                "start_time": 1359.93,
+                "end_time": 1364.65,
+                "ai_filters": {
+                  "text_cleanup": "Okay, so now, so now we are, we are moving all our business activities to Zoho.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Okay, so now, so now we are, we are moving all our business activities to Zoho."
+              },
+              {
+                "index": 181,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "So this can be integrated into Zoho?",
+                "start_time": 1364.81,
+                "end_time": 1367.77,
+                "ai_filters": {
+                  "text_cleanup": "So this can be integrated into Zoho?",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": "So this can be integrated into Zoho?",
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So this can be integrated into Zoho?"
+              },
+              {
+                "index": 182,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Yes, Zoho has an API.",
+                "start_time": 1368.09,
+                "end_time": 1369.77,
+                "ai_filters": {
+                  "text_cleanup": "Yes, Zoho has an API.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yes, Zoho has an API."
+              },
+              {
+                "index": 183,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "They give an API.",
+                "start_time": 1370.57,
+                "end_time": 1371.65,
+                "ai_filters": {
+                  "text_cleanup": "They give an API.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "They give an API."
+              },
+              {
+                "index": 184,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Zoho API can be connected to this format.",
+                "start_time": 1371.65,
+                "end_time": 1374.53,
+                "ai_filters": {
+                  "text_cleanup": "Zoho API can be connected to this format.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Zoho API can be connected to this format."
+              },
+              {
+                "index": 185,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Like say for example.",
+                "start_time": 1374.53,
+                "end_time": 1375.37,
+                "ai_filters": {
+                  "text_cleanup": "Like say for example.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Like say for example."
+              },
+              {
+                "index": 186,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Yeah, there is a connection output connection.",
+                "start_time": 1375.37,
+                "end_time": 1378.05,
+                "ai_filters": {
+                  "text_cleanup": "Yeah, there is a connection output connection.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Yeah, there is a connection output connection."
+              },
+              {
+                "index": 187,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Is there any software where they give either an API or a webhook we will be able to connect is possible.",
+                "start_time": 1378.05,
+                "end_time": 1386.51,
+                "ai_filters": {
+                  "text_cleanup": "Is there any software where they give either an API or a webhook we will be able to connect is possible.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Is there any software where they give either an API or a webhook we will be able to connect is possible."
+              },
+              {
+                "index": 188,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So they have to give an output.",
+                "start_time": 1386.51,
+                "end_time": 1388.27,
+                "ai_filters": {
+                  "text_cleanup": "So they have to give an output.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "So they have to give an output."
+              },
+              {
+                "index": 189,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "They have to give a API or a webhook.",
+                "start_time": 1389.55,
+                "end_time": 1392.11,
+                "ai_filters": {
+                  "text_cleanup": "They have to give a API or a webhook.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "They have to give a API or a webhook."
+              },
+              {
+                "index": 190,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Of course Zoho has it.",
+                "start_time": 1392.27,
+                "end_time": 1393.39,
+                "ai_filters": {
+                  "text_cleanup": "Of course Zoho has it.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Of course Zoho has it."
+              },
+              {
+                "index": 191,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Any, any software which has an API or a webhook we can connect it not just in Zoho, but they should have that API facility.",
+                "start_time": 1393.39,
+                "end_time": 1401.39,
+                "ai_filters": {
+                  "text_cleanup": "Any, any software which has an API or a webhook we can connect it not just in Zoho, but they should have that API facility.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Any, any software which has an API or a webhook we can connect it not just in Zoho, but they should have that API facility."
+              },
+              {
+                "index": 192,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "Okay, I think that's it for me.",
+                "start_time": 1404.59,
+                "end_time": 1406.59,
+                "ai_filters": {
+                  "text_cleanup": "Okay, I think that's it for me.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Okay, I think that's it for me."
+              },
+              {
+                "index": 193,
+                "speaker_name": "Selvam",
+                "speaker_id": 0,
+                "raw_text": "That's it.",
+                "start_time": 1406.99,
+                "end_time": 1407.63,
+                "ai_filters": {
+                  "text_cleanup": "That's it.",
+                  "task": null,
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "That's it."
+              },
+              {
+                "index": 194,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "So what we do is we'll go out of this call and then I'll share that meet Mr. And then you just join back in the meet Mr. And we'll see that it would have come within a minute because by the time we close the meeting it would have processed and it will come just in a one or two minutes.",
+                "start_time": 1407.63,
+                "end_time": 1422.42,
+                "ai_filters": {
+                  "text_cleanup": "So what we do is we'll go out of this call and then I'll share that meet Mr. And then you just join back in the meet Mr. And we'll see that it would have come within a minute because by the time we close the meeting it would have processed and it will come just in a one or two minutes.",
+                  "task": "So what we do is we'll go out of this call and then I'll share that meet Mr. And then you just join back in the meet Mr. And we'll see that it would have come within a minute because by the time we close the meeting it would have processed and it will come just in a one or two minutes.",
+                  "pricing": null,
+                  "metric": "So what we do is we'll go out of this call and then I'll share that meet Mr. And then you just join back in the meet Mr. And we'll see that it would have come within a minute because by the time we close the meeting it would have processed and it will come just in a one or two minutes.",
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "So what we do is we'll go out of this call and then I'll share that meet Mr. And then you just join back in the meet Mr. And we'll see that it would have come within a minute because by the time we close the meeting it would have processed and it will come just in a one or two minutes."
+              },
+              {
+                "index": 195,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Okay, so yeah, I'll stop the share and I'll close the meeting.",
+                "start_time": 1422.9,
+                "end_time": 1426.98,
+                "ai_filters": {
+                  "text_cleanup": "Okay, so yeah, I'll stop the share and I'll close the meeting.",
+                  "task": "Okay, so yeah, I'll stop the share and I'll close the meeting.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "positive"
+                },
+                "text": "Okay, so yeah, I'll stop the share and I'll close the meeting."
+              },
+              {
+                "index": 196,
+                "speaker_name": "Mahesh Rajamani",
+                "speaker_id": 1,
+                "raw_text": "Come back on meet Mr.",
+                "start_time": 1426.98,
+                "end_time": 1428.02,
+                "ai_filters": {
+                  "text_cleanup": "Come back on meet Mr.",
+                  "task": "Come back on meet Mr.",
+                  "pricing": null,
+                  "metric": null,
+                  "question": null,
+                  "date_and_time": null,
+                  "sentiment": "neutral"
+                },
+                "text": "Come back on meet Mr."
+              }
+            ],
+            "title": "Meeting with Selvam",
+            "host_email": "mayat.mahesh@gmail.com",
+            "organizer_email": "mayat.mahesh@gmail.com",
+            "user": {
+              "user_id": "01K1SKYDZMJHGWX4YTE63SSW61",
+              "email": "mayat.mahesh@gmail.com",
+              "integrations": [
+                "zoom"
+              ],
+              "user_groups": [],
+              "name": "Mahesh Rajamani",
+              "num_transcripts": 5,
+              "recent_transcript": "01K3R33R93V802MZ91E1ZD2YQH",
+              "recent_meeting": "01K3R33R93V802MZ91E1ZD2YQH",
+              "minutes_consumed": 64.47000122070312,
+              "is_admin": true
+            },
+            "fireflies_users": [
+              "01K1SKYDZMJHGWX4YTE63SSW61"
+            ],
+            "privacy": "link",
+            "participants": [
+              "mayat.mahesh@gmail.com,selvamsaga@gmail.com",
+              "fred@fireflies.ai",
+              "selvamsaga@gmail.com"
+            ],
+            "date": 1756377900000,
+            "duration": 23.889999389648438,
+            "summary": null,
+            "meeting_info": {
+              "silent_meeting": false,
+              "summary_status": "processing",
+              "fred_joined": true
+            },
+            "transcript_url": "https://app.fireflies.ai/view/01K3R33R93V802MZ91E1ZD2YQH",
+            "audio_url": null,
+            "video_url": null,
+            "dateString": "2025-08-28T10:45:00.000Z",
+            "meeting_attendees": [
+              {
+                "displayName": null,
+                "email": "mayat.mahesh@gmail.com",
+                "phoneNumber": null,
+                "name": null,
+                "location": null
+              },
+              {
+                "displayName": null,
+                "email": "fred@fireflies.ai",
+                "phoneNumber": null,
+                "name": null,
+                "location": null
+              },
+              {
+                "displayName": null,
+                "email": "selvamsaga@gmail.com",
+                "phoneNumber": null,
+                "name": null,
+                "location": null
+              }
+            ],
+            "speakers": [
+              {
+                "id": 0,
+                "name": "Selvam"
+              },
+              {
+                "id": 1,
+                "name": "Mahesh Rajamani"
+              },
+              {
+                "id": 2,
+                "name": "Jyoti"
+              }
+            ],
+            "calendar_id": "01p3sk0mbf8dd6eea6jh9ajll0",
+            "cal_id": "01p3sk0mbf8dd6eea6jh9ajll0",
+            "calendar_type": "google",
+            "meeting_link": "https://us06web.zoom.us/j/81356360451?pwd=K6pg52Kg1mQRrdQF0oEE1ZYfaECW42.1"
+          }
+        }
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ],
+    "AI Agent": [
+      {
+        "json": {
+          "output": {
+            "ClientInfo_ClientName": "The Client Organization",
+            "ProjectOverview_Description": "The client is exploring an advanced AI agent solution to automate and customize the generation of meeting summaries and action points from transcripts across various formats.",
+            "CurrentChallenges_Text": "The client currently uses generic meeting summary tools like Microsoft Teams, which lack customization, self-learning capabilities, and specific output formats required by different departments or clients, resulting in manual editing and a standardized output.",
+            "ScopeOfWork_Text": "We will implement a self-learning AI agent that dynamically analyzes meeting transcripts to produce highly customized outputs, including email drafts, slides, Google Docs, and Google Sheets, adaptable to specific business, departmental, and individual preferences, with integration capabilities for platforms like Zoho.",
+            "KeyDeliverables_Text": "Key deliverables include a tailored AI agent configured to generate diverse meeting output formats, a self-learning mechanism that adapts to user edits, and the ability to integrate with existing business tools, such as Zoho, via API.",
+            "BenefitsROI_Heading": "Benefits & ROI",
+            "BenefitsROI_Text": "This solution will drastically reduce the time spent on manual meeting summary preparation, ensure consistent and personalized communication, and provide valuable insights into meeting dynamics through sentiment analysis, ultimately boosting efficiency and decision-making.",
+            "ResponsibilitiesTimelines_Text": "Our team will configure the AI agent based on your provided specific format requirements for different stakeholders and meeting types, ensuring precise and personalized output generation.",
+            "Investment_ReviewPeriod": "Details regarding investment and review periods were not discussed in this initial meeting.",
+            "NextSteps_Heading": "Next Steps",
+            "NextSteps_Text": "We recommend an immediate live demonstration of the draft generation process, followed by discussions to capture your precise format preferences and to plan the seamless integration with your Zoho environment."
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get a transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a transcript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file": {
+      "main": [
+        [
+          {
+            "node": "Replace text in a presentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace text in a presentation": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "1c2bb543-38d9-435d-9d9e-ea5632f0d66a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "342ef37867b7274f78856cf68d88765d8d8551c70b958a687c6b1500ca9d473c"
+  },
+  "id": "JrQbEmHI6evEiVp0",
+  "tags": []
+}
