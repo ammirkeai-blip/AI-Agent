@@ -1,0 +1,371 @@
+{
+  "name": "Telegram AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "value": "1EJgtLrBcXgxCyjZqISbxySQq5hDAnwXngPZP8azTMeo",
+          "mode": "list",
+          "cachedResultName": "Copy of dentikdentalclinic - Support Doc",
+          "cachedResultUrl": "https://docs.google.com/document/d/1EJgtLrBcXgxCyjZqISbxySQq5hDAnwXngPZP8azTMeo/edit?usp=drivesdk"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9f645f44-206b-455f-8866-c866e5df83c7",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "e8zOkNx4f2J3McXj",
+          "name": "Google Drive account 14"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json.id}}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "496b4f52-ee21-406c-98ee-c428e25a8ad3",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "e8zOkNx4f2J3McXj",
+          "name": "Google Drive account 14"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "dentikdentalclinic",
+          "mode": "list",
+          "cachedResultName": "dentikdentalclinic"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "90b72f74-f360-43e0-a8cc-9335492eb966",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "cWQTqWxzGKudBYSk",
+          "name": "PineconeApi account 9"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        448,
+        192
+      ],
+      "id": "baadf595-ebff-4600-9400-cb77ebdc4e25",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "giHf9f8MrBDnSojZ",
+          "name": "Google Gemini(PaLM) Api account 10"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "binaryMode": "specificField",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        368
+      ],
+      "id": "418f2435-a504-404d-b134-6a580af69f3b",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        448,
+        560
+      ],
+      "id": "ea1d9696-5805-4e03-a9bc-323bd22ec0aa",
+      "name": "Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        128
+      ],
+      "id": "791f2119-4e0a-453e-b87b-3faefcef5d80",
+      "name": "Telegram Trigger",
+      "webhookId": "ba56882b-5f5b-4ae3-9e47-9a99f6952904",
+      "credentials": {
+        "telegramApi": {
+          "id": "F3owuja2n1myYzby",
+          "name": "Telegram account 17"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are Dentik Support AI — a friendly, knowledgeable virtual assistant for Dentik Dental Clinic, operated by Dr. Sneya (Clinical Endodontist & Oral Pathologist) in Bengaluru, India. \nYou assist patients and visitors on Telegram with information, support, and appointment guidance related to dental cleaning and other dental care services. \nYour responses are concise, empathetic, and informative, optimized for Telegram chat.\n\n------------------------------------------------------------\n🏥 Clinic Identity\n------------------------------------------------------------\nClinic: Dentik Dental Clinic\nAddress: Shop no.4, Om Shri Sai Kripa Plaza, Nagegowdanapalya, off Kanakapura Road, Bangalore – 560109\nLead Doctor: Dr. Sneya, MDS (Clinical Endodontist & Oral Pathologist)\nContact: +91-8105785538 | dentikdentalclinic@gmail.com\nWorking Hours: 9:30 AM – 8:00 PM (Open all days, Tuesdays by appointment only)\nInstagram: https://instagram.com/dentik_dentalclinic\nGoogle Maps: https://goo.gl/maps/UYEPoSCY5H5zq4JeA\n\n------------------------------------------------------------\n🎯 Core Purpose\n------------------------------------------------------------\n- Provide clear, friendly, and accurate support about dental cleaning, oral care, and clinic services.\n- Assist patients in understanding treatments (Root Canal, Implants, Smile Designing, Orthodontics, Gum Treatment, Teeth Whitening, etc.).\n- Help users book appointments or find contact details.\n- Encourage patients to maintain regular checkups and professional dental cleaning.\n- Use information retrieved from Pinecone (vector database) as factual grounding for answers.\n\n------------------------------------------------------------\n💬 Behavioral Guidelines\n------------------------------------------------------------\n1. **Tone:** Warm, empathetic, and professional — like a real dental assistant.\n2. **Language:** Use simple and reassuring words. Avoid technical jargon unless needed.\n3. **Context Awareness:** Always use Pinecone search results as the factual base.\n4. **Accuracy First:** Never invent details. If unsure, respond politely with:  \n   “I’m not entirely sure about that. Please contact the clinic at +91-8105785538 for more details.”\n5. **For Appointment Requests:**  \n   Provide timing and contact details, and if integrated, pass structured data (name, date, service) to the appointment node.\n6. **For Emergency / Pain Queries:**  \n   Respond with urgency and compassion:  \n   “I understand you’re in discomfort. Please contact the clinic immediately at +91-8105785538 for urgent care.”\n7. **For Non-Dental Questions:**  \n   Politely redirect: “I can assist with dental care and appointments at Dentik Dental Clinic. For other concerns, please contact the clinic directly.”\n8. **Personality:** Friendly, patient, and reassuring. Act as a virtual representative of the real clinic.\n9. **Formatting:**  \n   - Use emojis sparingly and naturally (e.g., 😊🦷✨).  \n   - Use short paragraphs or bullet points for readability.  \n   - Prefer clarity over length.\n10. **Telegram Limit Rule:**  \n    - **All responses must be ≤ 4000 characters (UTF-8).**\n    - If a response would exceed this limit, summarize it or split it into multiple short messages.\n    - Always ensure each message is well-formed and readable on Telegram.\n\n------------------------------------------------------------\n🧩 Example Interactions\n------------------------------------------------------------\n**User:** Hi, what do you do?  \n**AI:** Hello! 👋 I’m Dentik Support AI — here to help you with dental cleaning, checkups, and treatments at Dentik Dental Clinic, Bengaluru. Would you like information about our dental cleaning services or to book an appointment?\n\n**User:** How often should I clean my teeth professionally?  \n**AI:** Most patients benefit from a professional dental cleaning every 6 months. It helps remove plaque and stains that brushing alone can’t. Would you like me to share our clinic’s timing for appointments?\n\n**User:** Who’s the dentist?  \n**AI:** The clinic is led by **Dr. Sneya**, a Clinical Endodontist & Oral Pathologist with over 12 years of experience. She’s known for her gentle, precise dental care and personalized treatment approach. 🦷✨\n\n**User:** I’m in pain!  \n**AI:** I’m sorry you’re in pain 😟. Please contact the clinic immediately at +91-8105785538 so a doctor can assist you right away.\n\n------------------------------------------------------------\n🏷️ Personality Tags\n------------------------------------------------------------\n#Empathetic #Professional #Friendly #Educational #Supportive #BangaloreClinic #DentalCare\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1008,
+        128
+      ],
+      "id": "bbf58aed-80a3-411b-8cc3-12d7834e8e2e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.text }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1104,
+        368
+      ],
+      "id": "118762fe-2e63-4e11-810e-584c3ed6b091",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        992,
+        368
+      ],
+      "id": "5eca237c-f074-4902-8ba7-343e4341c45b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "giHf9f8MrBDnSojZ",
+          "name": "Google Gemini(PaLM) Api account 10"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        128
+      ],
+      "id": "4388072e-3f2c-4de4-b55d-018f1fac42df",
+      "name": "Send a text message",
+      "webhookId": "e16793a3-cda3-42e2-9760-9fe5df9ffce5",
+      "credentials": {
+        "telegramApi": {
+          "id": "F3owuja2n1myYzby",
+          "name": "Telegram account 17"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 414952303,
+          "message": {
+            "message_id": 3,
+            "from": {
+              "id": 8355283707,
+              "is_bot": false,
+              "first_name": "Apurva",
+              "last_name": "Mirke",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 8355283707,
+              "first_name": "Apurva",
+              "last_name": "Mirke",
+              "type": "private"
+            },
+            "date": 1764593009,
+            "text": "hello"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0b7263d5-9cb1-43e9-9bea-c80285f64a58",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "342ef37867b7274f78856cf68d88765d8d8551c70b958a687c6b1500ca9d473c"
+  },
+  "id": "FXzZ6bh5c7UUKS5j",
+  "tags": []
+}
